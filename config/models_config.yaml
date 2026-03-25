@@ -1,0 +1,130 @@
+models:
+  qwen3_32b:
+    path: "Qwen/Qwen3-32B"
+    family: "qwen"
+    backend: "vllm"
+    tensor_parallel_size: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.90
+    enforce_eager: false
+    dtype: "bfloat16"
+    max_new_tokens: 8192
+    enable_prefix_caching: true
+    enable_chunked_prefill: true
+    max_num_batched_tokens: 32768
+    max_num_seqs: 256
+    disable_log_requests: true
+    disable_log_stats: true
+    quantization:
+      load_in_4bit: true
+      bnb_4bit_quant_type: "nf4"
+      bnb_4bit_compute_dtype: "bfloat16"
+      bnb_4bit_use_double_quant: true
+    generation:
+      do_sample: false
+      temperature: 0.0
+      repetition_penalty: 1.05
+
+  qwen3_8b:
+    path: "Qwen/Qwen3-8B"
+    family: "qwen"
+    backend: "vllm"
+    tensor_parallel_size: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.95
+    enforce_eager: false
+    dtype: "bfloat16"
+    max_new_tokens: 8192
+    enable_prefix_caching: true
+    enable_chunked_prefill: true
+    max_num_batched_tokens: 65536
+    max_num_seqs: 512
+    disable_log_requests: true
+    disable_log_stats: true
+    quantization:
+      load_in_4bit: true
+      bnb_4bit_quant_type: "nf4"
+      bnb_4bit_compute_dtype: "bfloat16"
+      bnb_4bit_use_double_quant: true
+    generation:
+      do_sample: false
+      temperature: 0.0
+      repetition_penalty: 1.05
+
+  deepseek_llama_70B:
+    path: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"
+    family: "deepseek"
+    backend: "vllm"
+    tensor_parallel_size: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.92
+    enforce_eager: false
+    dtype: "bfloat16"
+    max_new_tokens: 8192
+    enable_prefix_caching: true
+    enable_chunked_prefill: true
+    max_num_batched_tokens: 16384
+    max_num_seqs: 128
+    disable_log_requests: true
+    disable_log_stats: true
+    quantization:
+      load_in_4bit: true
+      bnb_4bit_quant_type: "nf4"
+      bnb_4bit_compute_dtype: "bfloat16"
+      bnb_4bit_use_double_quant: true
+    generation:
+      do_sample: false
+      temperature: 0.0
+      repetition_penalty: 1.05
+
+  deepseek_llama_8b:
+    path: "deepseek-ai/DeepSeek-R1-Distill-Llama-8B"
+    family: "deepseek"
+    backend: "vllm"
+    tensor_parallel_size: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.85
+    enforce_eager: false
+    dtype: "bfloat16"
+    max_new_tokens: 8192
+    enable_prefix_caching: true
+    enable_chunked_prefill: true
+    max_num_batched_tokens: 65536
+    max_num_seqs: 512
+    disable_log_requests: true
+    disable_log_stats: true
+    quantization:
+      load_in_4bit: true
+      bnb_4bit_quant_type: "nf4"
+      bnb_4bit_compute_dtype: "bfloat16"
+      bnb_4bit_use_double_quant: true
+    generation:
+      do_sample: false
+      temperature: 0.0
+      repetition_penalty: 1.05
+
+  deepseek_qwen_7b:
+    path: "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+    family: "qwen"
+    backend: "vllm"
+    tensor_parallel_size: 1
+    max_model_len: 16384
+    gpu_memory_utilization: 0.92
+    enforce_eager: false
+    dtype: "bfloat16"
+    max_new_tokens: 8192
+    enable_prefix_caching: true
+    enable_chunked_prefill: true
+    max_num_batched_tokens: 32768
+    max_num_seqs: 256
+    disable_log_requests: true
+    disable_log_stats: true
+    quantization:
+      load_in_4bit: true
+      bnb_4bit_quant_type: "nf4"
+      bnb_4bit_compute_dtype: "bfloat16"
+      bnb_4bit_use_double_quant: true
+    generation:
+      do_sample: false
+      temperature: 0.0
+      repetition_penalty: 1.05

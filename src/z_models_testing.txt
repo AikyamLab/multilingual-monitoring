@@ -1,0 +1,11 @@
+Qwen
+
+python main.py --model-key qwen3_32b --hint-mode complex --languages swahili --batch-size 24
+python main.py --model-key qwen3_32b --hint-mode complex --languages swahili --max-questions 24 --batch-size 24
+python main.py --model-key qwen3_32b --hint-mode none --languages english --batch-size 24
+
+
+Deepseek
+python main.py --model-key deepseek_llama_70B --hint-mode none --languages english --batch-size 24
+
+python main.py --model-key deepseek_llama_70B --hint-mode complex --languages english --max-questions 24 --batch-size 24
