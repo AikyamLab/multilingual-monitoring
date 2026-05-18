@@ -1,4 +1,4 @@
-# The Fragility of Chain-of-Thought Monitoring Across Typologically Diverse Languages
+<h1 align="center">The Fragility of Chain-of-Thought Monitoring Across Typologically Diverse Languages</h1>
 
 <p align="center">
   <a href="https://multilingual-cot-monitoring.github.io/"><img src="https://img.shields.io/badge/Website-Project_Page-1f6feb?style=flat&labelColor=222222"></a>
@@ -7,17 +7,17 @@
 
 <p align="center"><em>by</em></p>
 
-<table align="center">
-  <tr>
-    <td align="center"><b>Eric Onyame</b><br>University of Virginia</td>
-    <td align="center"><b>Runtao Zhou</b><br>University of Virginia</td>
-    <td align="center"><b>Kowshik Thopalli</b><br>Lawrence Livermore<br>National Laboratory</td>
-    <td align="center"><b>Bhavya Kailkhura</b><br>Lawrence Livermore<br>National Laboratory</td>
-    <td align="center"><b>Chirag Agarwal</b><br>University of Virginia</td>
-  </tr>
-</table>
+<p align="center">
+  <b>Eric Onyame</b><sup>1</sup> &nbsp;&middot;&nbsp;
+  <b>Runtao Zhou</b><sup>1</sup> &nbsp;&middot;&nbsp;
+  <b>Kowshik Thopalli</b><sup>2</sup> &nbsp;&middot;&nbsp;
+  <b>Bhavya Kailkhura</b><sup>2</sup> &nbsp;&middot;&nbsp;
+  <b>Chirag Agarwal</b><sup>1</sup>
+</p>
 
-<p align="center"><b>Corresponding author:</b> Eric Onyame</p>
+<p align="center">
+  <sup>1</sup>University of Virginia &nbsp;&nbsp;&nbsp; <sup>2</sup>Lawrence Livermore National Laboratory
+</p>
 
 <br>
 
