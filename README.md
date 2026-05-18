@@ -55,24 +55,33 @@ For more examples of this deceptive behavior, see the [project website](https://
 ### `config/` — Configuration
 All experiment knobs live here as YAML. We separate **what to run** (models, judges) from **how to phrase it** (prompts, hints) so that adding a new model or a new language never requires touching the inference code.
 
-- **`models_config.yaml`** — Specs for the 16 frontier models under evaluation (Hugging Face IDs, context lengths, sampling parameters).
-- **`judges_config.yaml`** — Specs for the CoT-monitor (judge) models used to score whether a model's chain-of-thought is faithful or deceptive.
+- **`models_config.yaml`** — Specs for every model under evaluation (Hugging Face IDs or API model names, family, backend, generation parameters, quantization options, and API-key locations for closed models).
+- **`judges_config.yaml`** — Specs for the CoT-monitor (judge) models used to score whether a model's chain-of-thought is faithful or deceptive. Each judge entry declares its `type` (`open` or `closed`) and is paired with a hint mode (`simple_hint_judge` or `complex_hint_judge`).
 - **`prompts_config.yaml`** — Holds all language-dependent text in one place. Three top-level blocks:
-  - `languages`: maps language codes (`english`, `swahili`, `telugu`, …) to display names. 13 typologically diverse languages are supported.
-  - `hints`: adversarial hint text per language, organized by hint mode (`none` / `simple` / `complex`).
-  - `translations`: per-language prompt components (system message, instruction wrappers) consumed by the prompt builder.
+  - `languages` — maps language codes (`english`, `swahili`, `telugu`, …) to display names. 13 typologically diverse languages are supported.
+  - `hints` — adversarial hint text per language, organized by hint mode (`none` / `simple` / `complex`).
+  - `translations` — per-language prompt components (`system`, `instruction`, `question_label`, `think_in`, `hacking_starter`) consumed by the prompt builder.
 
 ### `data_process/` — Data loading
-- **`data_loader.py`** — Defines `GPQAExample` (a frozen dataclass with language, question, and four answer options) and a streaming dataset class. Option A is always the gold answer; B/C/D are distractors. Hint text is **not** stored on the example — it is injected later by the prompt builder, so the same dataset can be reused across hint modes without re-loading.
+- **`data_loader.py`** — Defines `GPQAExample` (a frozen dataclass with language, question, and four answer options) and `GPQADataLoader` for streaming. Option A is always the gold answer; B/C/D are distractors. Hint text is **not** stored on the example — it is injected later by the prompt builder, so the same dataset can be reused across hint modes without re-loading.
 
 ### `gpqa_dataset/` — Evaluation data
-The 13-language GPQA splits used in the paper. Each split contains the same questions, translated and adapted per language.
+The 13-language GPQA splits used in the paper, stored as one `.jsonl` file per language under `gpqa_dataset/json/`. Each split contains the same questions, translated and adapted per language.
 
 ### `src/` — Experiment core
-- **`main.py`** — Single entry point for the full pipeline. Handles GPU pinning (model under test on GPU 0, judge on GPU 1), sets up Hugging Face / vLLM / torchinductor caches in scratch space, parses CLI arguments, loads the YAML configs, and dispatches to the inference engine. Run this to reproduce any experiment in the paper.
-- **`model_loader.py`** — Loads the model under test via vLLM using the spec in `models_config.yaml`.
-- **`prompt_builder.py`** — Composes the final prompt for a given `(language, hint_mode, example)` triple by stitching the multilingual templates and hint strings from `prompts_config.yaml`.
-- **`inference_engine.py`** — Drives generation: runs the model, captures chain-of-thought + final answer, and (where applicable) collects logit-lens probabilities for white-box analysis.
-- **`closed_judge/` and `open_judge/`** — Two implementations of the CoT monitor sharing a common interface: one wraps closed-source APIs, the other runs open-weights judges locally. Experiments can swap judges without code changes.
-- **`applications/`** — Downstream analyses that consume the raw generations: deception-rate computation, logit-lens trajectories, per-language breakdowns, and figure-generating scripts.
-- **`results/` and `logs/`** — Generated artifacts. Populated when you run experiments locally; historical runs are not tracked in git.
+- **`main.py`** — Single entry point for the open- and closed-model pipelines. Pins the model under test to GPU 0 and the judge to GPU 1, sets up Hugging Face / vLLM / torchinductor caches in scratch space, parses CLI arguments, loads the YAML configs, and dispatches to the appropriate inference backend. It extracts the final answer from each generation (`AnswerExtractor`), invokes the configured judge whenever the model lands on the hinted option, and writes per-language logs plus cumulative summaries (`SummaryManager`, `RunPaths`).
+- **`inference_engine.py`** — Factory and implementations for four generation backends behind a common `BaseInferenceEngine` interface:
+  - `HFInferenceEngine` — Hugging Face Transformers (uses `model_loader.py`).
+  - `VLLMInferenceEngine` — vLLM backend for high-throughput open-weights inference.
+  - `OpenAIInferenceEngine` — OpenAI chat-completions backend (e.g., `gpt-5-mini`, `gpt-4o-mini`).
+  - `AnthropicInferenceEngine` — Anthropic messages backend (e.g., `claude-opus-4-7`, `claude-sonnet-4-6`).
+
+  The factory picks the backend from the `backend` field in `models_config.yaml`. API backends read keys from the environment or from a local `.env` file pointed to by `api_key_dir`.
+- **`model_loader.py`** — Hugging Face loader for the `HFInferenceEngine` path. Reads quantization, dtype, and attention settings from `models_config.yaml` and dispatches to family-specific loaders (`qwen`, `deepseek`, `gemma`). New families are added by registering a `_load_<family>(cfg)` function in `_FAMILY_LOADERS`.
+- **`prompt_builder.py`** — Composes the final prompt for a given `(language, hint_mode, example)` triple by stitching multilingual templates and hint strings from `prompts_config.yaml`. Adversarial hints are inserted **after** the question and options. A per-language "thinking starter" is then appended inside an opened `<think>` block to keep the model's chain-of-thought in the chosen language.
+- **`closed_judge/` and `open_judge/`** — Two implementations of the CoT monitor sharing a common interface. `closed_judge/` wraps closed-source API models as the judge; `open_judge/` runs open-weights judges locally. Each side provides `simple_hint_judge.py` and `complex_hint_judge.py`; the runner picks which to import based on the hint mode and the `type` field in `judges_config.yaml`.
+- **`gpt-oss_20b_inference.py` / `gpt-oss_120b_inference.py`** — Stand-alone scripts for the GPT-OSS family, kept separate from `main.py` because these models require Mxfp4 quantization, a developer/user chat format, and runtime attention-implementation selection that doesn't fit the unified backend abstraction.
+- **`results/` and `logs/`** — Generated artifacts. Populated when you run experiments locally; not tracked in git.
+
+### `figures/` — Paper figures
+Source files (PDF / PNG) for the figures used in the paper and on this README.
