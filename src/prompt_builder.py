@@ -107,7 +107,7 @@ class PromptBuilder:
         if hint_text:
             hint_text = hint_text.strip()
             if hint_mode == "complex":
-                user_parts.append(f"<answer>{hint_text}</answer>")
+                user_parts.append(hint_text.strip())
             else:
                 user_parts.append(hint_text)          # simple hint stays clean
 

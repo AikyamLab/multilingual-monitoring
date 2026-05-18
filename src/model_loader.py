@@ -3,7 +3,7 @@ import yaml
 import torch
 from pathlib import Path
 from typing import Callable
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, AutoProcessor
 
 # ====================== PATH CONFIGURATION ======================
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -87,6 +87,21 @@ def _load_deepseek(cfg: dict):
     return model, tokenizer
 
 
+
+def _load_gemma(cfg: dict):
+    """Load Gemma 3 or Gemma 4 models (text-only compatible)."""
+    print(" → Gemma: using AutoProcessor + AutoModelForCausalLM")
+    processor = AutoProcessor.from_pretrained(cfg["path"], trust_remote_code=True)
+    if hasattr(processor, "tokenizer"):
+        processor.tokenizer = _finalize_tokenizer(processor.tokenizer)
+    model = AutoModelForCausalLM.from_pretrained(
+        cfg["path"],
+        **_common_model_kwargs(cfg, trust_remote_code=True),
+    )
+    model.eval()
+    return model, processor
+
+
 # ====================== REGISTER NEW FAMILIES HERE ======================
 # To add a new model family (e.g. Llama, Mistral, Gemma):
 # 1. Create a new _load_xxx(cfg) function above
@@ -94,7 +109,7 @@ def _load_deepseek(cfg: dict):
 _FAMILY_LOADERS: dict[str, Callable] = {
     "qwen": _load_qwen,
     "deepseek": _load_deepseek,
-    # "llama": _load_llama,      # ← future example
+    "gemma": _load_gemma,     
     # "mistral": _load_mistral,  # ← future example
 }
 
@@ -143,14 +158,14 @@ def load_model(
     return model, tokenizer, cfg
 
 
-# ====================== QUICK TEST ======================
-if __name__ == "__main__":
-    import sys
-    key = sys.argv[1] if len(sys.argv) > 1 else "deepseek_llama_70B"
-    print(f"Testing model_loader with key: '{key}'\n")
-    model, tokenizer, cfg = load_model(key)
-    print(f"Model class     : {type(model).__name__}")
-    print(f"Tokenizer class : {type(tokenizer).__name__}")
-    print(f"Vocab size      : {tokenizer.vocab_size}")
-    print(f"Pad token       : {tokenizer.pad_token!r}")
-    print(f"Config returned : {cfg}")
+# # ====================== QUICK TEST ======================
+# if __name__ == "__main__":
+#     import sys
+#     key = sys.argv[1] if len(sys.argv) > 1 else "deepseek_llama_70B"
+#     print(f"Testing model_loader with key: '{key}'\n")
+#     model, tokenizer, cfg = load_model(key)
+#     print(f"Model class     : {type(model).__name__}")
+#     print(f"Tokenizer class : {type(tokenizer).__name__}")
+#     print(f"Vocab size      : {tokenizer.vocab_size}")
+#     print(f"Pad token       : {tokenizer.pad_token!r}")
+#     print(f"Config returned : {cfg}")

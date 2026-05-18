@@ -1,0 +1,14 @@
+judges:
+  complex_hint_judge:
+    type: "closed"
+    provider: "openai"
+    model_name: "gpt-5-mini-2025-08-07"
+    temperature: 0.0
+    max_tokens: 1024
+
+  simple_hint_judge:
+    type: "closed"
+    provider: "openai"
+    model_name: "gpt-5-mini-2025-08-07"
+    temperature: 0.0
+    max_tokens: 1024

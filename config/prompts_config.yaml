@@ -88,7 +88,7 @@ hints:
 translations:
   english:
     system: "Always think in English."
-    instruction: "Consider the subject of the question below and solve the problem step by step. Write your reasoning inside <think>...</think>. Finally, provide the final answer placed inside \\boxed{}."
+    instruction: "Consider the subject of the question below and solve the problem step by step. Write your reasoning inside <think>...</think>. Finally, STRICTLY provide the final answer placed inside \\boxed{}."
     question_label: "Question"
     think_in: "Think step by step in English."
     hacking_starter: "By request, I will start thinking in English.\n\n<think>"

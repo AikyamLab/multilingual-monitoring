@@ -1,11 +1,91 @@
 Qwen
 
 python main.py --model-key qwen3_32b --hint-mode complex --languages swahili --batch-size 24
-python main.py --model-key qwen3_32b --hint-mode complex --languages swahili --max-questions 24 --batch-size 24
-python main.py --model-key qwen3_32b --hint-mode none --languages english --batch-size 24
+python main.py --model-key qwen3_8b --hint-mode complex --languages english --max-questions 8 --batch-size 8
+python main.py --model-key qwen3_8b --hint-mode complex --languages english --batch-size 64
+
+python main.py --model-key qwen3_32b --hint-mode none,simple,complex --languages english,german,french,spanish --batch-size 64
+
+python main.py --model-key qwen3_32b --hint-mode none,simple,complex --languages arabic,bengali,chinese,japanese,korean --batch-size 64
+
+python main.py --model-key qwen3_32b --hint-mode none --languages russian,swahili,telugu,vietnamese --batch-size 64
+
+python main.py --model-key qwen3_32b --hint-mode complex --languages russian,swahili,telugu,vietnamese --batch-size 64
+
+
+python main.py --model-key qwen3_32b --hint-mode complex --languages english --max-questions 24 --batch-size 24 --num-samples 3 --judge-on C
+
+python main.py --model-key qwen3_8b --hint-mode simple --judge-on C
+
+python main.py --model-key deepseek_llama_70b --hint-mode simple --languages vietnamese --num-samples 5 --judge-on C
+
+
+###############################################
+python main.py --model-key qwen3_8b --hint-mode complex --languages english --max-questions 8 --batch-size 8 --num-samples 5
+
+python main.py --model-key qwen3_8b --hint-mode complex --languages english,german,french,spanish,arabic --batch-size 64 --num-samples 5
+
+python main.py --model-key qwen3_8b --hint-mode complex --languages bengali,chinese,japanese,korean --batch-size 64 --num-samples 5
+
+python main.py --model-key qwen3_8b --hint-mode complex --languages russian,swahili,telugu,vietnamese --batch-size 64 --num-samples 5
+
+python main.py --model-key deepseek_llama_70b --hint-mode none --languages english,german,french,spanish,arabic,bengali,chinese,japanese,korean,russian,swahili,telugu,vietnamese --batch-size 64 --num-samples 5
+
+
+################################################
 
 
 Deepseek
-python main.py --model-key deepseek_llama_70B --hint-mode none --languages english --batch-size 24
+python main.py --model-key deepseek_llama_70b --hint-mode none --languages english --batch-size 24
+python main.py --model-key deepseek_qwen_32b --hint-mode complex --languages english --max-questions 24 --batch-size 24
+python main.py --model-key qwen3_8b --hint-
 
 python main.py --model-key deepseek_llama_70B --hint-mode complex --languages english --max-questions 24 --batch-size 24
+
+python main.py --model-key deepseek_qwen_32b --hint-mode complex --languages english,german,french,spanish,arabic,bengali,chinese,japanese,korean,russian,swahili,telugu,vietnamese --batch-size 64 
+
+python main.py --model-key deepseek_llama_8b --hint-mode complex --languages english,german,french,spanish,arabic,bengali,chinese,japanese,korean,russian,swahili,telugu,vietnamese --batch-size 64
+
+gpt_0ss:
+python main.py --model-key gpt_oss_20b --hint-mode complex --languages english --batch-size 16
+python main.py --model-key gpt_oss_120b --hint-mode none --languages english --max-questions 8 --batch-size 16
+
+
+llama: 
+
+APIKEY for llama: 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
+
+run this in the terminal to use llama model: huggingface-cli login --token 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
+
+python main.py --model-key llama_3.1_70b --hint-mode complex --languages english --max-questions 8 --batch-size 8 --num-samples 1
+
+python main.py --model-key llama_3.1_70b --hint-mode complex --languages english --batch-size 64 --num-samples 1
+
+python main.py --model-key llama_3.3_70b --hint-mode complex --languages english,german,french,spanish,arabic,bengali,chinese,japanese,korean,russian,swahili,telugu,vietnamese --batch-size 64 --num-samples 1
+
+
+
+gemma:
+
+python main.py --model-key gemma_3_27b --hint-mode complex --languages english --max-questions 8 --batch-size 8 --num-samples 1
+
+python main.py --model-key gemma_3_27b --hint-mode none --languages english,german,french,spanish,arabic,bengali,chinese,japanese,korean,russian,swahili,telugu,vietnamese --batch-size 64 --num-samples 1
+
+gpt:
+
+python main.py --model-key gpt_5_4_mini --hint-mode complex \
+    --languages english --num-samples 1 --judge-on C --max-questions 24
+
+python main.py --model-key gpt_5_4_mini --hint-mode complex --languages english --num-samples 1 --judge-on C --max-questions 50
+
+python main.py --model-key gpt_4o_mini --hint-mode complex --languages english --num-samples 1 --judge-on C --max-questions 24
+python main.py --model-key gpt_5_mini --hint-mode simple --num-samples 1 --judge-on C
+
+
+
+claude: 
+
+python main.py --model-key claude_opus_4_7 --hint-mode complex --languages english --num-samples 1 --judge-on C --max-questions 24
+
+
+python main.py --model-key claude_sonnet_4_6 --hint-mode none --num-samples 1 --judge-on C
