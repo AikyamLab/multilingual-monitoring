@@ -204,3 +204,8 @@ output/
 ```
 
 Summary files are updated incrementally after each language finishes, so partial progress is preserved if a run is interrupted.
+
+
+## Citation
+
+A BibTeX entry will be added here once the arXiv preprint is live. In the meantime, please link to the [project website](https://multilingual-cot-monitoring.github.io/) if you reference this work.
