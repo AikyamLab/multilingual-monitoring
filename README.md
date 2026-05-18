@@ -63,13 +63,13 @@ All experiment knobs live here as YAML. We separate **what to run** (models, jud
   - `translations` — per-language prompt components (`system`, `instruction`, `question_label`, `think_in`, `hacking_starter`) consumed by the prompt builder.
 
 ### `data_process/` — Data loading
-- **`data_loader.py`** — Defines `GPQAExample` (a frozen dataclass with language, question, and four answer options) and `GPQADataLoader` for streaming. Option A is always the gold answer; B/C/D are distractors. Hint text is **not** stored on the example — it is injected later by the prompt builder, so the same dataset can be reused across hint modes without re-loading.
-
+- **`data_loader.py`** — Defines `GPQAExample` (a frozen dataclass with language, question, and four answer options) and `GPQADataLoader` for streaming. Option A is always the gold answer.
+  
 ### `gpqa_dataset/` — Evaluation data
 The 13-language GPQA splits used in the paper, stored as one `.jsonl` file per language under `gpqa_dataset/json/`. Each split contains the same questions, translated and adapted per language.
 
 ### `src/` — Experiment core
-- **`main.py`** — Single entry point for the open- and closed-model pipelines. Pins the model under test to GPU 0 and the judge to GPU 1, sets up Hugging Face / vLLM / torchinductor caches in scratch space, parses CLI arguments, loads the YAML configs, and dispatches to the appropriate inference backend. It extracts the final answer from each generation (`AnswerExtractor`), invokes the configured judge whenever the model lands on the hinted option, and writes per-language logs plus cumulative summaries (`SummaryManager`, `RunPaths`).
+- **`main.py`** — Single entry point for the open- and closed-model pipelines. Sets up Hugging Face / vLLM / torchinductor caches in scratch space, parses CLI arguments, loads the YAML configs, and dispatches to the appropriate inference backend. It extracts the final answer from each generation (`AnswerExtractor`), invokes the configured judge whenever the model lands on the hinted option, and writes per-language logs plus cumulative summaries (`SummaryManager`, `RunPaths`).
 - **`inference_engine.py`** — Factory and implementations for four generation backends behind a common `BaseInferenceEngine` interface:
   - `HFInferenceEngine` — Hugging Face Transformers (uses `model_loader.py`).
   - `VLLMInferenceEngine` — vLLM backend for high-throughput open-weights inference.
@@ -81,7 +81,126 @@ The 13-language GPQA splits used in the paper, stored as one `.jsonl` file per l
 - **`prompt_builder.py`** — Composes the final prompt for a given `(language, hint_mode, example)` triple by stitching multilingual templates and hint strings from `prompts_config.yaml`. Adversarial hints are inserted **after** the question and options. A per-language "thinking starter" is then appended inside an opened `<think>` block to keep the model's chain-of-thought in the chosen language.
 - **`closed_judge/` and `open_judge/`** — Two implementations of the CoT monitor sharing a common interface. `closed_judge/` wraps closed-source API models as the judge; `open_judge/` runs open-weights judges locally. Each side provides `simple_hint_judge.py` and `complex_hint_judge.py`; the runner picks which to import based on the hint mode and the `type` field in `judges_config.yaml`.
 - **`gpt-oss_20b_inference.py` / `gpt-oss_120b_inference.py`** — Stand-alone scripts for the GPT-OSS family, kept separate from `main.py` because these models require Mxfp4 quantization, a developer/user chat format, and runtime attention-implementation selection that doesn't fit the unified backend abstraction.
-- **`results/` and `logs/`** — Generated artifacts. Populated when you run experiments locally; not tracked in git.
 
-### `figures/` — Paper figures
-Source files (PDF / PNG) for the figures used in the paper and on this README.
+
+
+
+
+## How to Run
+
+All experiments are launched from `src/` via `main.py`, with the exception of GPT-OSS models (see §4 below). The runner pins the model under evaluation to GPU 0 and the judge to GPU 1, so a node with at least two CUDA devices is required when using an open source model as a Judge. All experiments in the paper were run on NVIDIA H200 GPUs.
+
+### 1. Setup
+
+```bash
+git clone https://github.com/AikyamLab/multilingual-monitoring.git
+cd multilingual-monitoring
+```
+
+**Hugging Face access** (for gated open-weights models such as Llama):
+
+```bash
+huggingface-cli login --token <YOUR_HF_TOKEN>
+```
+
+**API keys** (for OpenAI / Anthropic models) — either export in your shell:
+
+```bash
+export OPENAI_API_KEY=sk-...
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+or place them in a `.env` file at the path declared in `api_key_dir` for the corresponding entry in `models_config.yaml` (one `KEY=VALUE` per line).
+
+### 2. Basic usage
+
+```bash
+cd src
+python main.py \
+    --model-key <model_from_models_config> \
+    --hint-mode <none|simple|complex> \
+    --languages <all|english,german,...> \
+    --batch-size 64 \
+    --num-samples 1 \
+    --judge-on C
+```
+
+| Flag | Description | Default |
+|---|---|---|
+| `--model-key` | Key from `config/models_config.yaml` (e.g., `qwen3_32b`, `claude_opus_4_7`). | required |
+| `--hint-mode` | Which adversarial hint to inject. One of `none`, `simple`, `complex`. | required |
+| `--judge-on` | Which option (`B`/`C`/`D`) triggers the judge. The judge inspects only generations that land on this letter. | `C` |
+| `--languages` | Comma-separated language codes, or `all` for the full 13-language set. | `all` |
+| `--max-questions` | Positive integer or `all`. Useful for quick sanity checks. | `all` |
+| `--batch-size` | Prompts per generation batch. | `64` |
+| `--num-samples` | Samples per question (use `>1` with non-zero temperature for repeated trials). | `1` |
+
+### 3. Example runs
+
+**Quick sanity check on a small subset:**
+
+```bash
+python main.py --model-key qwen3_8b --hint-mode complex \
+    --languages english --max-questions 8 --batch-size 8
+```
+
+**Full open-weights run across all 13 languages:**
+
+```bash
+python main.py --model-key qwen3_32b --hint-mode complex \
+    --languages all --batch-size 64
+```
+
+**Multi-sample run for variance estimates:**
+
+```bash
+python main.py --model-key qwen3_8b --hint-mode complex \
+    --languages all --num-samples 5 --batch-size 64
+```
+
+**Closed-source model (OpenAI):**
+
+```bash
+python main.py --model-key gpt_5_mini --hint-mode simple \
+    --languages all --num-samples 1 --judge-on C
+```
+
+**Closed-source model (Anthropic):**
+
+```bash
+python main.py --model-key claude_opus_4_7 --hint-mode complex \
+    --languages english --num-samples 1 --judge-on C --max-questions 24
+```
+
+**Targeting a different hinted option** (run the same experiment with `B` as the adversarial target instead of `C`):
+
+```bash
+python main.py --model-key qwen3_32b --hint-mode complex \
+    --languages all --judge-on B
+```
+
+### 4. GPT-OSS models
+
+GPT-OSS 20B and 120B require Mxfp4 quantization and a developer/user chat format, so they are not routed through `main.py`. They are run instead via dedicated scripts that prompt interactively for hint mode, languages, and samples-per-question:
+
+```bash
+cd src
+python gpt-oss_120b_inference.py
+python gpt-oss_20b_inference.py
+```
+
+### 5. Output layout
+
+Each run writes to:
+
+```
+output/
+└── <model_key>/
+    ├── logs_<judge_on>_random/<hint_mode>/
+    │   └── <language>_<hint_mode>_logs.txt        # per-question logs: prompt, generation, extracted answer, judge verdict
+    └── results_<judge_on>_random/<hint_mode>/
+        ├── <hint_mode>_overall_summary.txt        # human-readable cumulative summary across languages
+        └── <hint_mode>_overall_summary.json       # machine-readable counts for downstream analysis
+```
+
+Summary files are updated incrementally after each language finishes, so partial progress is preserved if a run is interrupted.
