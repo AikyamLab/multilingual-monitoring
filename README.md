@@ -45,4 +45,4 @@ Our results show that CoT monitoring is fundamentally fragile under linguistic d
 
 <p align="center">High-resolution PDF: <a href="assets/figure1_deceptive_reasoning.pdf">Figure 1</a></p>
 
-For full technical details and experiments, see the [project website](https://multilingual-cot-monitoring.github.io/).
+For more examples of this deceptive behavior, see the [project website](https://multilingual-cot-monitoring.github.io/) and our paper (arXiv coming soon)
