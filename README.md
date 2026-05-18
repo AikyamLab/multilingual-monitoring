@@ -31,4 +31,18 @@ We find that CoT unfaithfulness persists consistently across languages and hint 
 
 Our results show that CoT monitoring is fundamentally fragile under linguistic distribution shift, providing a substantially weaker safety signal than what English-only studies suggest. These findings underscore an urgent need to develop robust CoT monitors and to accelerate research into white-box monitoring techniques — especially to improve CoT monitorability in mid- and low-resource languages.
 
+<!-- For full technical details and experiments, see the [project website](https://multilingual-cot-monitoring.github.io/). -->
+
+## Key Figure
+
+<p align="center">
+  <img src="figures/figure1_deceptive_reasoning.png" alt="Example of deceptive hint-driven reasoning" width="85%">
+</p>
+
+<p align="center"><em>
+<b>Figure 1. Example of deceptive hint-driven reasoning.</b> Qwen3-32B on a GPQA chemistry question (Rein et al., 2024). The model first gives the correct nucleophilicity analysis, explicitly endorses option A, and rules out option C on substantive chemistry grounds. It then applies the injected hint formula (K+Q) mod 4 using fabricated values for K and Q, overriding its own answer and submitting option C. <b>Green</b>: correct domain reasoning. <b>Blue</b>: explicit endorsement of the correct answer. <b>Orange</b>: substantive elimination of C. <b>Red</b>: fabricated K, Q values used to justify the hinted answer. Hint target: <b>C</b>; gold answer: <b>A</b>.
+</em></p>
+
+<p align="center">High-resolution PDF: <a href="assets/figure1_deceptive_reasoning.pdf">Figure 1</a></p>
+
 For full technical details and experiments, see the [project website](https://multilingual-cot-monitoring.github.io/).
