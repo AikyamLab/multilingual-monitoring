@@ -31,6 +31,7 @@ results/
 batch_script/
 src/main_old_scipt.py
 src/applications/
+src/z_annotation_prompt.txt
 
 # ============================================
 # gpt logs 
