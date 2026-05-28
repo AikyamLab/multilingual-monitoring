@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://multilingual-cot-monitoring.github.io/"><img src="https://img.shields.io/badge/Website-Project_Page-1f6feb?style=flat&labelColor=222222"></a>
-  <a href="#"><img src="https://img.shields.io/badge/arXiv-coming_soon-b31b1b?style=flat&labelColor=222222"></a>
+  <a href="https://arxiv.org/abs/2605.27901"><img src="https://img.shields.io/badge/arXiv-2605.27901-b31b1b?style=flat&labelColor=222222"></a>
 </p>
 
 <p align="center"><em>by</em></p>
@@ -45,7 +45,7 @@ Our results show that CoT monitoring is fundamentally fragile under linguistic d
 
 <p align="center">High-resolution PDF: <a href="assets/figure1_deceptive_reasoning.pdf">Figure 1</a></p>
 
-For more examples of this deceptive behavior, see the [project website](https://multilingual-cot-monitoring.github.io/) and our paper (arXiv coming soon)
+For more examples of this deceptive behavior, see the [project website](https://multilingual-cot-monitoring.github.io/) and [our paper](https://arxiv.org/abs/2605.27901).
 
 
 
@@ -208,4 +208,16 @@ Summary files are updated incrementally after each language finishes, so partial
 
 ## Citation
 
-A BibTeX entry will be added here once the arXiv preprint is live. In the meantime, please link to the [project website](https://multilingual-cot-monitoring.github.io/) if you reference this work.
+If you find this work useful, please cite:
+
+```bibtex
+@misc{onyame2026fragilitychainofthoughtmonitoringtypologically,
+      title={The Fragility of Chain-of-Thought Monitoring Across Typologically Diverse Languages},
+      author={Eric Onyame and Runtao Zhou and Kowshik Thopalli and Bhavya Kailkhura and Chirag Agarwal},
+      year={2026},
+      eprint={2605.27901},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2605.27901}
+}
+```
