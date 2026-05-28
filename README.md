@@ -2,7 +2,7 @@
 
 <p align="center">
   <a href="https://multilingual-cot-monitoring.github.io/"><img src="https://img.shields.io/badge/Website-Project_Page-1f6feb?style=flat&labelColor=222222"></a>
-  <a href="#"><img src="https://img.shields.io/badge/arXiv-coming_soon-b31b1b?style=flat&labelColor=222222"></a>
+  <a href="https://arxiv.org/abs/2605.27901v1"><img src="https://img.shields.io/badge/arXiv-coming_soon-b31b1b?style=flat&labelColor=222222"></a>
 </p>
 
 <p align="center"><em>by</em></p>
